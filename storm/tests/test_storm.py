@@ -320,7 +320,10 @@ def test_check(aggregator):
     )
     test_tags = env_tags + storm_version_tags
     for name, count, value in test_cases:
-        aggregator.assert_metric('storm.cluster.{}'.format(name), count=count, value=value, tags=test_tags)
+        aggregator.assert_metric(
+            f'storm.cluster.{name}', count=count, value=value, tags=test_tags
+        )
+
 
     # Nimbus Stats
     test_cases = (
@@ -335,8 +338,12 @@ def test_check(aggregator):
 
     for name, count, value, additional_tags in test_cases:
         aggregator.assert_metric(
-            'storm.nimbus.{}'.format(name), count=count, value=value, tags=test_tags + additional_tags
+            f'storm.nimbus.{name}',
+            count=count,
+            value=value,
+            tags=test_tags + additional_tags,
         )
+
 
     # Supervisor Stats
     test_cases = (
@@ -350,7 +357,7 @@ def test_check(aggregator):
     )
 
     for name, count, value in test_cases:
-        aggregator.assert_metric('storm.supervisor.{}'.format(name), count=count, value=value)
+        aggregator.assert_metric(f'storm.supervisor.{name}', count=count, value=value)
 
     # Topology Stats
     test_cases = (
@@ -383,8 +390,12 @@ def test_check(aggregator):
 
     for name, count, value in test_cases:
         aggregator.assert_metric(
-            'storm.topologyStats.{}.{}'.format(interval, name), count=count, value=value, tags=test_tags
+            f'storm.topologyStats.{interval}.{name}',
+            count=count,
+            value=value,
+            tags=test_tags,
         )
+
 
     # Bolt Stats
     for name, values in [
@@ -395,7 +406,7 @@ def test_check(aggregator):
         ('Bolt5', (2, 0.001, 1014.634, 0.000, 0, 208890, 17, 104445, 17, 2, 1e10, 0, 0, 0)),
         ('Bolt6', (3, 0.010, 0.005, 0.000, 0, 4705, 0, 4705, 0, 3, 1e10, 0, 0, 0)),
     ]:
-        test_tags = storm_version_tags + env_tags + topology_tags + ['bolt:{}'.format(name)]
+        test_tags = storm_version_tags + env_tags + topology_tags + [f'bolt:{name}']
         for i, metric_name in enumerate(
             [
                 'tasks',
@@ -415,12 +426,16 @@ def test_check(aggregator):
             ]
         ):
             aggregator.assert_metric(
-                'storm.bolt.last_60.{}'.format(metric_name), value=values[i], tags=test_tags, count=1
+                f'storm.bolt.last_60.{metric_name}',
+                value=values[i],
+                tags=test_tags,
+                count=1,
             )
+
 
     # Spout Stats
     for name, values in [('source', (8, 285.950, 0, 104673, 104673, 104673, 8, 38737, 0, 0, 0))]:
-        test_tags = storm_version_tags + topology_tags + env_tags + ['spout:{}'.format(name)]
+        test_tags = storm_version_tags + topology_tags + env_tags + [f'spout:{name}']
         for i, metric_name in enumerate(
             [
                 'tasks',
@@ -437,8 +452,12 @@ def test_check(aggregator):
             ]
         ):
             aggregator.assert_metric(
-                'storm.spout.last_60.{}'.format(metric_name), value=values[i], tags=test_tags, count=1
+                f'storm.spout.last_60.{metric_name}',
+                value=values[i],
+                tags=test_tags,
+                count=1,
             )
+
 
     # # Topology Metrics
     metric_cases = (
@@ -450,10 +469,16 @@ def test_check(aggregator):
         ),
     )
     for m in ['acked', 'complete_ms_avg', 'emitted', 'transferred']:
-        aggregator.assert_metric('storm.topologyStats.metrics.spouts.last_60.{}'.format(m), at_least=1)
+        aggregator.assert_metric(
+            f'storm.topologyStats.metrics.spouts.last_60.{m}', at_least=1
+        )
+
 
     for m in ['acked', 'emitted', 'executed', 'executed_ms_avg', 'process_ms_avg', 'transferred']:
-        aggregator.assert_metric('storm.topologyStats.metrics.bolts.last_60.{}'.format(m), at_least=1)
+        aggregator.assert_metric(
+            f'storm.topologyStats.metrics.bolts.last_60.{m}', at_least=1
+        )
+
 
     for case in metric_cases:
         aggregator.assert_metric(case[0], value=case[1], tags=case[2], count=1)
@@ -502,20 +527,20 @@ def test_integration_with_ci_cluster(dd_environment, aggregator):
 
     test_tags = storm_version_tags + env_tags
     for name in test_cases:
-        aggregator.assert_metric('storm.cluster.{}'.format(name), count=1, tags=test_tags)
+        aggregator.assert_metric(f'storm.cluster.{name}', count=1, tags=test_tags)
 
     # Nimbus Stats
     test_cases = ['numLeaders', 'numFollowers', 'numOffline', 'numDead']
     test_tags = env_tags + storm_version_tags
 
     for name in test_cases:
-        aggregator.assert_metric('storm.nimbus.{}'.format(name), count=1)
+        aggregator.assert_metric(f'storm.nimbus.{name}', count=1)
 
     # Supervisor Stats
     test_cases = ['slotsTotal', 'slotsUsed', 'totalMem', 'usedMem', 'totalCpu', 'usedCpu']
 
     for name in test_cases:
-        aggregator.assert_metric('storm.supervisor.{}'.format(name), count=1)
+        aggregator.assert_metric(f'storm.supervisor.{name}', count=1)
 
     # Topology Stats
     test_cases = [
@@ -547,7 +572,12 @@ def test_integration_with_ci_cluster(dd_environment, aggregator):
     interval = 'last_60'
 
     for name in test_cases:
-        aggregator.assert_metric('storm.topologyStats.{}.{}'.format(interval, name), at_least=1, tags=test_tags)
+        aggregator.assert_metric(
+            f'storm.topologyStats.{interval}.{name}',
+            at_least=1,
+            tags=test_tags,
+        )
+
 
     if not aggregator.metrics('storm.bolt.last_60.tasks'):
         # It may takes some time for bolt/spout stats to appear
@@ -559,7 +589,7 @@ def test_integration_with_ci_cluster(dd_environment, aggregator):
         ('split', (8, None, None, None, None, None, None, None, None, 8, None, None, None, None)),
         ('count', (12, None, None, None, None, None, None, None, None, 12, None, None, None, None)),
     ]:
-        test_tags = env_tags + topology_tags + ['bolt:{}'.format(name)] + storm_version_tags
+        test_tags = env_tags + topology_tags + [f'bolt:{name}'] + storm_version_tags
         for i, metric_name in enumerate(
             [
                 'tasks',
@@ -579,12 +609,16 @@ def test_integration_with_ci_cluster(dd_environment, aggregator):
             ]
         ):
             aggregator.assert_metric(
-                'storm.bolt.last_60.{}'.format(metric_name), value=values[i], tags=test_tags, at_least=1
+                f'storm.bolt.last_60.{metric_name}',
+                value=values[i],
+                tags=test_tags,
+                at_least=1,
             )
+
 
     # Spout Stats
     for name, values in [('spout', (5, None, None, None, None, None, 5, None, None, None, None))]:
-        test_tags = topology_tags + ['spout:{}'.format(name)] + env_tags + storm_version_tags
+        test_tags = topology_tags + [f'spout:{name}'] + env_tags + storm_version_tags
         for i, metric_name in enumerate(
             [
                 'tasks',
@@ -601,5 +635,8 @@ def test_integration_with_ci_cluster(dd_environment, aggregator):
             ]
         ):
             aggregator.assert_metric(
-                'storm.spout.last_60.{}'.format(metric_name), value=values[i], tags=test_tags, at_least=1
+                f'storm.spout.last_60.{metric_name}',
+                value=values[i],
+                tags=test_tags,
+                at_least=1,
             )

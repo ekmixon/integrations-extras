@@ -69,9 +69,10 @@ def nextcloud_install():
         'occ',
         'maintenance:install',
         '-n',
-        '--admin-user={}'.format(USER),
-        '--admin-pass={}'.format(PASSWORD),
+        f'--admin-user={USER}',
+        f'--admin-pass={PASSWORD}',
     ]
+
     return subprocess.call(status_args) == 0
 
 
@@ -90,8 +91,9 @@ def nextcloud_add_trusted_domain():
         'config:system:set',
         'trusted_domains',
         '2',
-        '--value={}'.format(HOST),
+        f'--value={HOST}',
     ]
+
     return subprocess.call(status_args) == 0
 
 
@@ -99,5 +101,5 @@ def nextcloud_stats():
     """
     Wait for nextcloud monitoring endpoint to be reachable
     """
-    status_args = ['curl', '-u', '{}:{}'.format(USER, PASSWORD), VALID_URL]
+    status_args = ['curl', '-u', f'{USER}:{PASSWORD}', VALID_URL]
     return subprocess.call(status_args) == 0

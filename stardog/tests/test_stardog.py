@@ -22,7 +22,7 @@ def setup_module(module):
     global HTTP
     HTTP = HttpServerThread()
     HTTP.start()
-    INSTANCE['stardog_url'] = 'http://localhost:{}'.format(HTTP.port)
+    INSTANCE['stardog_url'] = f'http://localhost:{HTTP.port}'
 
 
 def teardown_module(module):
@@ -43,7 +43,7 @@ def test_check_all_metrics(aggregator):
     tags = copy.deepcopy(INSTANCE['tags'])
     tags.append("stardog_url:http://localhost:%d" % HTTP.port)
     for metric_key in DATA:
-        metric_name = "stardog.%s" % metric_key
+        metric_name = f"stardog.{metric_key}"
         metric_val = DATA[metric_key]['value']
         aggregator.assert_metric(metric_name, count=1, value=metric_val, tags=tags)
     aggregator.assert_all_metrics_covered

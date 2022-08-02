@@ -206,7 +206,7 @@ def generate_http_profiler_body(body_update):
     }
 
     if body_update:
-        base_body.update(body_update)
+        base_body |= body_update
 
     return base_body
 
@@ -439,7 +439,7 @@ def test_check(aggregator, instance):
     check = FilebeatCheck("filebeat", {}, [instance])
     check.check(instance)
     check.check(instance)
-    tags = ["stats_endpoint:{}".format(instance['stats_endpoint'])]
+    tags = [f"stats_endpoint:{instance['stats_endpoint']}"]
     aggregator.assert_metric("filebeat.harvester.running", metric_type=aggregator.GAUGE, count=2, tags=tags)
     aggregator.assert_metric("libbeat.config.module.starts", metric_type=aggregator.COUNTER, count=1, tags=tags)
     aggregator.assert_service_check("filebeat.can_connect", status=FilebeatCheck.OK, tags=tags)

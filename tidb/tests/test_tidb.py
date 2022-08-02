@@ -43,11 +43,16 @@ def test_transform():
 @pytest.mark.unit
 def test_customized_metrics(customized_metric_instance):
     check = TiDBCheck(TEST_CHECK_NAME, {}, [customized_metric_instance])
-    target = None
-    for i in check.instances:
-        if i.get("namespace") == "tidb" and i.get("prometheus_url") == "http://localhost:10080/metrics":
-            target = i
-            break
+    target = next(
+        (
+            i
+            for i in check.instances
+            if i.get("namespace") == "tidb"
+            and i.get("prometheus_url") == "http://localhost:10080/metrics"
+        ),
+        None,
+    )
+
     assert (
         target.get("metrics")[0].get("tidb_tikvclient_rawkv_cmd_seconds") == "tikvclient_rawkv_cmd_seconds"
     ), "customized metric failed."
@@ -81,5 +86,11 @@ def _test_metrics(aggregator, instance, expected_metrics):
         aggregator.assert_metric(metric)
 
     aggregator.assert_all_metrics_covered()
-    aggregator.assert_service_check(check.__NAMESPACE__ + '.' + instance['namespace'] + '.prometheus.health', count=1)
+    aggregator.assert_service_check(
+        f'{check.__NAMESPACE__}.'
+        + instance['namespace']
+        + '.prometheus.health',
+        count=1,
+    )
+
     aggregator.assert_metrics_using_metadata(get_metadata_metrics(), check_metric_type=False)

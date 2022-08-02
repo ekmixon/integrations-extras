@@ -84,13 +84,15 @@ def dd_environment():
     with kind_run(conditions=[setup_cert_manager]) as kubeconfig:
         with ExitStack() as stack:
             ip_ports = [stack.enter_context(port_forward(kubeconfig, 'cert-manager', 'cert-manager', PORT))]
-        instances = {
+        yield {
             'instances': [
-                {'prometheus_url': 'http://{}:{}/metrics'.format(*ip_ports[0])},
+                {
+                    'prometheus_url': 'http://{}:{}/metrics'.format(
+                        *ip_ports[0]
+                    )
+                },
             ]
         }
-
-        yield instances
 
 
 @pytest.fixture

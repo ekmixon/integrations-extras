@@ -9,13 +9,13 @@ EVENT_TYPE = SOURCE_TYPE_NAME = 'stardog'
 
 
 def convert_value(in_key, in_val, db_name):
-    key = "stardog.%s" % in_key
+    key = f"stardog.{in_key}"
     val = in_val['value']
     return {key: val}
 
 
 def convert_count(in_key, in_val, dn_name):
-    key = "stardog.%s" % in_key
+    key = f"stardog.{in_key}"
     val = in_val['count']
     return {key: val}
 
@@ -48,13 +48,13 @@ def convert_query_speed(in_key, in_val, dn_name):
     ]
     out_dict = {}
     for ent in entry_key:
-        new_key = "stardog.%s.%s" % (in_key, ent)
+        new_key = f"stardog.{in_key}.{ent}"
         out_dict[new_key] = in_val[ent]
     return out_dict
 
 
 def convert_db_specific(in_key, in_val, dn_name, func):
-    key = in_key.replace("%s." % dn_name, '')
+    key = in_key.replace(f"{dn_name}.", '')
     return func(key, in_val, dn_name)
 
 
@@ -111,8 +111,8 @@ class StardogCheck(AgentCheck):
                     db_name = None
                     if add_db_tags:
                         try:
-                            db_name = m.group(1)
-                            local_tags.append("database:%s" % db_name)
+                            db_name = m[1]
+                            local_tags.append(f"database:{db_name}")
                         except Exception:
                             self.log.warning("No database name was found")
                     values_map = convert_func(k, doc[k], db_name)
@@ -125,8 +125,10 @@ class StardogCheck(AgentCheck):
         try:
             auth_token = base64.b64encode(ensure_bytes(instance["username"] + ":" + instance["password"])).decode()
             response = requests.get(
-                instance['stardog_url'] + '/admin/status', headers={'Authorization': 'Basic {}'.format(auth_token)}
+                instance['stardog_url'] + '/admin/status',
+                headers={'Authorization': f'Basic {auth_token}'},
             )
+
         except KeyError:
             raise Exception('The Stardog check instance is not properly configured')
 
@@ -141,6 +143,6 @@ class StardogCheck(AgentCheck):
         except KeyError:
             tags = []
 
-        tags.append("stardog_url:%s" % instance['stardog_url'])
+        tags.append(f"stardog_url:{instance['stardog_url']}")
         self._process_doc(json_doc, _g_metrics_map, tags)
         self._process_doc(json_doc, _g_bd_specific_map, tags, add_db_tags=True)

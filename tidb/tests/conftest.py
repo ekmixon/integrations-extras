@@ -72,9 +72,9 @@ def get_mock_metrics(filename):
 
 
 required_instance = {
-    'tidb_metric_url': "http://{}:{}/metrics".format(HOST, TIDB_PORT),
-    'tikv_metric_url': "http://{}:{}/metrics".format(HOST, TIKV_PORT),
-    'pd_metric_url': "http://{}:{}/metrics".format(HOST, PD_PORT),
+    'tidb_metric_url': f"http://{HOST}:{TIDB_PORT}/metrics",
+    'tikv_metric_url': f"http://{HOST}:{TIKV_PORT}/metrics",
+    'pd_metric_url': f"http://{HOST}:{PD_PORT}/metrics",
 }
 
 
@@ -83,14 +83,15 @@ def full_instance():
     base = deepcopy(required_instance)
     base.update(
         {
-            "tiflash_metric_url": "http://{}:{}/metrics".format(HOST, TIFLASH_PORT),
-            "tiflash_proxy_metric_url": "http://{}:{}/metrics".format(HOST, TIFLASH_PROXY_PORT),
-            "ticdc_metric_url": "http://{}:{}/metrics".format(HOST, TICDC_PORT),
-            "dm_master_metric_url": "http://{}:{}/metrics".format(HOST, DM_MASTER_PORT),
-            "dm_worker_metric_url": "http://{}:{}/metrics".format(HOST, DM_WORKER_PORT),
-            "pump_metric_url": "http://{}:{}/metrics".format(HOST, PUMP_PORT),
+            "tiflash_metric_url": f"http://{HOST}:{TIFLASH_PORT}/metrics",
+            "tiflash_proxy_metric_url": f"http://{HOST}:{TIFLASH_PROXY_PORT}/metrics",
+            "ticdc_metric_url": f"http://{HOST}:{TICDC_PORT}/metrics",
+            "dm_master_metric_url": f"http://{HOST}:{DM_MASTER_PORT}/metrics",
+            "dm_worker_metric_url": f"http://{HOST}:{DM_WORKER_PORT}/metrics",
+            "pump_metric_url": f"http://{HOST}:{PUMP_PORT}/metrics",
         }
     )
+
     return base
 
 
@@ -106,14 +107,23 @@ def customized_metric_instance():
 
 @pytest.fixture(scope="session")
 def tidb_instance():
-    return {'prometheus_url': "http://{}:{}/metrics".format(HOST, TIDB_PORT), 'namespace': 'tidb'}
+    return {
+        'prometheus_url': f"http://{HOST}:{TIDB_PORT}/metrics",
+        'namespace': 'tidb',
+    }
 
 
 @pytest.fixture(scope="session")
 def tikv_instance():
-    return {'prometheus_url': "http://{}:{}/metrics".format(HOST, TIKV_PORT), 'namespace': 'tikv'}
+    return {
+        'prometheus_url': f"http://{HOST}:{TIKV_PORT}/metrics",
+        'namespace': 'tikv',
+    }
 
 
 @pytest.fixture(scope="session")
 def pd_instance():
-    return {'prometheus_url': "http://{}:{}/metrics".format(HOST, PD_PORT), 'namespace': 'pd'}
+    return {
+        'prometheus_url': f"http://{HOST}:{PD_PORT}/metrics",
+        'namespace': 'pd',
+    }

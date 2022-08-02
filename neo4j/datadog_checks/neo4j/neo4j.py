@@ -88,8 +88,8 @@ class Neo4jCheck(AgentCheck):
     def check(self, instance):
         host, port, user, password, timeout, server_name = self._get_config(instance)
         tags = instance.get('tags', [])
-        tags.append('server_name:{}'.format(server_name))
-        service_check_tags = tags + ['url:{}'.format(host)]
+        tags.append(f'server_name:{server_name}')
+        service_check_tags = tags + [f'url:{host}']
         auth = (user, password)
 
         # Neo specific
@@ -107,12 +107,12 @@ class Neo4jCheck(AgentCheck):
             version = self._get_version(host, port, timeout, auth, service_check_tags)
 
             if version > 2:
-                check_url = "{}:{}/db/data/transaction/commit".format(host, port)
+                check_url = f"{host}:{port}/db/data/transaction/commit"
             else:
-                check_url = "{}:{}/v1/service/metrics".format(host, port)
+                check_url = f"{host}:{port}/v1/service/metrics"
             r = requests.post(check_url, auth=auth, json=payload, timeout=timeout)
         except Exception as e:
-            msg = "Unable to fetch Neo4j stats: {}".format(e)
+            msg = f"Unable to fetch Neo4j stats: {e}"
             self._critical_service_check(service_check_tags, msg)
             raise CheckException(msg)
 
@@ -130,9 +130,7 @@ class Neo4jCheck(AgentCheck):
             if name in self.keys:
                 try:
                     self.gauge(self.display.get(name, ""), doc['row'][1], tags=tags)
-                except TypeError:
-                    continue
-                except ValueError:
+                except (TypeError, ValueError):
                     continue
 
     def _get_config(self, instance):
@@ -143,14 +141,11 @@ class Neo4jCheck(AgentCheck):
         connect_timeout = instance.get('connect_timeout')
         server_name = instance.get('server_name', '')
 
-        timeout = None
-        if connect_timeout:
-            timeout = Timeout(connect=connect_timeout)
-
+        timeout = Timeout(connect=connect_timeout) if connect_timeout else None
         return host, port, user, password, timeout, server_name
 
     def _get_version(self, host, port, timeout, auth, service_check_tags):
-        version_url = '{}:{}/db/data/'.format(host, port)
+        version_url = f'{host}:{port}/db/data/'
         headers_sent = {'Content-Type': 'application/json'}
         r = requests.get(version_url, auth=auth, headers=headers_sent, timeout=timeout)
         if r.status_code != 200:
@@ -161,10 +156,7 @@ class Neo4jCheck(AgentCheck):
         stats = r.json()
         version = stats.get('neo4j_version')
         self.log.debug("Neo4j version: %s", version)
-        version = version.split('.')
-        if version:
-            return int(version[0])
-        return 0
+        return int(version[0]) if (version := version.split('.')) else 0
 
     def _critical_service_check(self, service_check_tags, message):
         self.service_check(self.SERVICE_CHECK_NAME, AgentCheck.CRITICAL, tags=service_check_tags, message=message)

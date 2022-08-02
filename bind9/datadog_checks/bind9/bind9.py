@@ -21,7 +21,12 @@ class Bind9Check(AgentCheck):
         if not dns_url:
             raise ConfigurationError('The statistic channel URL must be specified in the configuration')
 
-        self.service_check(self.BIND_SERVICE_CHECK, AgentCheck.OK, message='Connection to %s was successful' % dns_url)
+        self.service_check(
+            self.BIND_SERVICE_CHECK,
+            AgentCheck.OK,
+            message=f'Connection to {dns_url} was successful',
+        )
+
 
         root = self.getStatsFromUrl(dns_url)
         self.collectTimeMetric(root, 'boot-time')
@@ -39,8 +44,7 @@ class Bind9Check(AgentCheck):
             self.service_check(self.BIND_SERVICE_CHECK, AgentCheck.CRITICAL, message="stats cannot be taken")
             raise
 
-        root = ET.fromstring(response.text)
-        return root
+        return ET.fromstring(response.text)
 
     def DateTimeToEpoch(self, DateTime):
         # Ignore time zone
@@ -55,7 +59,7 @@ class Bind9Check(AgentCheck):
         for counter in root.iter("counters"):
             if counter.get('type') == queryType:
                 for query in counter:
-                    self.SendMetricsToAgent('{}_{}'.format(queryType, query.get('name')), query.text)
+                    self.SendMetricsToAgent(f"{queryType}_{query.get('name')}", query.text)
 
     def SendMetricsToAgent(self, metricName, metricValue):
-        self.gauge('bind9.{}'.format(metricName), metricValue)
+        self.gauge(f'bind9.{metricName}', metricValue)

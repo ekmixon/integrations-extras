@@ -22,7 +22,7 @@ def test_minimal_config(aggregator):
     testable_metrics = NEO4J_VARS
 
     for mname in testable_metrics:
-        aggregator.assert_metric('neo4j.{}'.format(mname), tags=[])
+        aggregator.assert_metric(f'neo4j.{mname}', tags=[])
 
     aggregator.assert_all_metrics_covered()
 

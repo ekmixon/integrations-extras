@@ -177,7 +177,9 @@ class FilebeatCheckInstanceConfig:
 
         self._timeout = instance.get("timeout", 2)
         if not isinstance(self._timeout, numbers.Real) or self._timeout <= 0:
-            raise Exception("If given, filebeats timeout must be a positive number, got %s" % (self._timeout,))
+            raise Exception(
+                f"If given, filebeats timeout must be a positive number, got {self._timeout}"
+            )
 
     @property
     def registry_file_path(self):
@@ -193,10 +195,13 @@ class FilebeatCheckInstanceConfig:
 
     def should_keep_metric(self, metric_name):
 
-        if not self._only_metrics:
-            return True
-
-        return any(re.search(regex, metric_name) for regex in self._compiled_regexes())
+        return (
+            any(
+                re.search(regex, metric_name) for regex in self._compiled_regexes()
+            )
+            if self._only_metrics
+            else True
+        )
 
     def _compiled_regexes(self):
         if self._only_metrics_regexes is None:

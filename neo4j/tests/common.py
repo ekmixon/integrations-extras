@@ -1,6 +1,6 @@
 from datadog_checks.dev import get_docker_hostname
 
-URL = 'http://{}'.format(get_docker_hostname())
+URL = f'http://{get_docker_hostname()}'
 
 CHECK_NAME = 'neo4j'
 

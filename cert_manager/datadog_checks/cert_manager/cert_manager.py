@@ -12,7 +12,7 @@ class CertManagerCheck(OpenMetricsBaseCheck):
 
     def __init__(self, name, init_config, instances=None):
         METRIC_MAP = dict(CONTROLLER_METRICS)
-        METRIC_MAP.update(ACME_METRICS)
+        METRIC_MAP |= ACME_METRICS
         METRIC_MAP.update(CERT_METRICS)
 
         default_instances = {'cert_manager': {'metrics': [METRIC_MAP]}}
@@ -24,7 +24,7 @@ class CertManagerCheck(OpenMetricsBaseCheck):
     def process(self, scraper_config, metric_transformers=None):
         # Override the process method to send the health metric, as service checks can be disabled.
         endpoint = scraper_config.get('prometheus_url')
-        tags = ['endpoint:{}'.format(endpoint)]
+        tags = [f'endpoint:{endpoint}']
         if scraper_config.get('custom_tags'):
             tags.extend(scraper_config.get('custom_tags'))
 

@@ -91,7 +91,7 @@ def test_check(aggregator):
     port = 9600
     bad_port = 9405
     url = URL
-    bad_url = 'http://{}:{}'.format(HOST, bad_port)
+    bad_url = f'http://{HOST}:{bad_port}'
 
     tags = [u"foo:bar", u"baz"]
 
@@ -104,7 +104,7 @@ def test_check(aggregator):
         check.check(bad_instance)
 
     check.check(good_instance)
-    default_tags = ["url:{}".format(URL)]
+    default_tags = [f"url:{URL}"]
 
     instance_config = check.get_instance_config(good_instance)
 
@@ -120,16 +120,16 @@ def test_check(aggregator):
         input_tag.append(u"input_name:stdin")
 
     expected_metrics = dict(STATS_METRICS)
-    expected_metrics.update(PIPELINE_METRICS)
+    expected_metrics |= PIPELINE_METRICS
     expected_metrics.update(PIPELINE_INPUTS_METRICS)
     expected_metrics.update(PIPELINE_OUTPUTS_METRICS)
     expected_metrics.update(PIPELINE_FILTERS_METRICS)
 
-    good_sc_tags = ['host:{}'.format(HOST), 'port:{}'.format(port)]
-    bad_sc_tags = ['host:{}'.format(HOST), 'port:{}'.format(bad_port)]
+    good_sc_tags = [f'host:{HOST}', f'port:{port}']
+    bad_sc_tags = [f'host:{HOST}', f'port:{bad_port}']
 
     pipeline_metrics = dict(PIPELINE_METRICS, **PIPELINE_INPUTS_METRICS)
-    pipeline_metrics.update(PIPELINE_FILTERS_METRICS)
+    pipeline_metrics |= PIPELINE_FILTERS_METRICS
     pipeline_metrics.update(PIPELINE_OUTPUTS_METRICS)
 
     for m_name, desc in expected_metrics.items():
@@ -141,8 +141,8 @@ def test_check(aggregator):
         if m_name in PIPELINE_FILTERS_METRICS:
             m_tags = m_tags + filter_tag
 
-        is_pipeline_metric = m_name in pipeline_metrics
         if desc[0] == "gauge":
+            is_pipeline_metric = m_name in pipeline_metrics
             if is_multi_pipeline and is_pipeline_metric:
                 aggregator.assert_metric(m_name, count=1, tags=m_tags + [u'pipeline_name:main'])
                 aggregator.assert_metric(m_name, count=1, tags=m_tags + [u'pipeline_name:second_pipeline'])

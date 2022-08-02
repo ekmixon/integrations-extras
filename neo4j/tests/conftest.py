@@ -14,7 +14,8 @@ DOCKER_DIR = os.path.join(HERE, 'docker')
 
 def init_user():
     instance = NEO4J_MINIMAL_CONFIG
-    url = '{}:{}/user/{}/password'.format(instance['neo4j_url'], instance['port'], instance['user'])
+    url = f"{instance['neo4j_url']}:{instance['port']}/user/{instance['user']}/password"
+
     r = requests.post(url, json={'password': instance['password']}, auth=(instance['user'], 'neo4j'))
     r.raise_for_status()
 

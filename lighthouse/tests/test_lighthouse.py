@@ -29,10 +29,7 @@ def test_check(aggregator, instance):
 
     lighthouse_check.check(instance)
 
-    tags = []
-    tags.append("url:{0}".format(instance["url"]))
-    tags.append("name:{0}".format(instance["name"]))
-
+    tags = ["url:{0}".format(instance["url"]), "name:{0}".format(instance["name"])]
     aggregator.assert_metric(name="lighthouse.accessibility", value=86, tags=tags)
     aggregator.assert_metric(name="lighthouse.best_practices", value=79, tags=tags)
     aggregator.assert_metric(name="lighthouse.performance", value=74, tags=tags)

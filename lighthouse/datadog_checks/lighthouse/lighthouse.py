@@ -25,8 +25,9 @@ class LighthouseCheck(AgentCheck):
             "--output",
             "json",
             "--quiet",
-            "--chrome-flags='{}'".format(" ".join(CHROME_FLAGS + extra_chrome_flags)),
+            f"""--chrome-flags='{" ".join(CHROME_FLAGS + extra_chrome_flags)}'""",
         ]
+
 
         json_string, error_message, exit_code = LighthouseCheck._get_lighthouse_report(cmd, self.log, False)
 

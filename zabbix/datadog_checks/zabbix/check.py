@@ -39,8 +39,7 @@ class ZabbixCheck(AgentCheck):
         self.log.debug("Logging in with params user=%s api=%s", zabbix_user, zabbix_api)
 
         response = self.request(zabbix_api, req_data)
-        token = response.get('result')
-        return token
+        return response.get('result')
 
     def logout(self, token, zabbix_api):
         req_data = json.dumps({'jsonrpc': '2.0', 'method': 'user.logout', 'params': {}, 'auth': token, 'id': 1})
@@ -123,9 +122,7 @@ class ZabbixCheck(AgentCheck):
         )
 
         response = self.request(zabbix_api, req_data)
-        result = response.get('result')
-
-        return result
+        return response.get('result')
 
     def check(self, instance):
         zabbix_user = instance.get('zabbix_user')
@@ -177,7 +174,7 @@ class ZabbixCheck(AgentCheck):
                 mname = METRICS[item_name]
 
                 try:
-                    dd_metricname = 'zabbix.' + mname
+                    dd_metricname = f'zabbix.{mname}'
                     dd_metricvalue = history[0]['value']
                     dd_hostname = hostdic[hostid].replace(' ', '_')
                 except Exception as e:

@@ -20,18 +20,18 @@ class TiDBCheck(OpenMetricsBaseCheck):
 
             def _required_instance(component):
                 new_instance = deepcopy(instance)
-                url = new_instance.get(component + "_metric_url")
+                url = new_instance.get(f"{component}_metric_url")
                 if url is None:
-                    raise ConfigurationError("`" + component + "_metric_url` parameter is required.")
-                customized_metrics = new_instance.get(component + "_customized_metrics", [])
+                    raise ConfigurationError(f"`{component}_metric_url` parameter is required.")
+                customized_metrics = new_instance.get(f"{component}_customized_metrics", [])
                 new_instance.update({'prometheus_url': url, 'namespace': component, 'metrics': customized_metrics})
                 openmetrics_instances.append(new_instance)
 
             def _optional_instance(component):
                 new_instance = deepcopy(instance)
-                url = new_instance.get(component + "_metric_url")
+                url = new_instance.get(f"{component}_metric_url")
                 if url is not None:
-                    customized_metrics = new_instance.get(component + "_customized_metrics", [])
+                    customized_metrics = new_instance.get(f"{component}_customized_metrics", [])
                     new_instance.update({'prometheus_url': url, 'namespace': component, 'metrics': customized_metrics})
                     openmetrics_instances.append(new_instance)
 

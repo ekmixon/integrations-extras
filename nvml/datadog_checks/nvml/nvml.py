@@ -108,7 +108,7 @@ class NvmlCheck(AgentCheck):
                 handle = NvmlCheck.N.nvmlDeviceGetHandleByIndex(i)
                 uuid = NvmlCheck.N.nvmlDeviceGetUUID(handle)
                 # The tags used by https://github.com/NVIDIA/gpu-monitoring-tools/blob/master/exporters/prometheus-dcgm/dcgm-exporter/dcgm-exporter # noqa: E501
-                tags = ["gpu:" + str(i)]
+                tags = [f"gpu:{str(i)}"]
                 # Appends k8s specific tags
                 tags += self.get_tags(uuid)
                 self.gather_gpu(handle, tags)
@@ -186,7 +186,7 @@ class NvmlCheck(AgentCheck):
             return self.known_tags.get(device_id, self.known_tags.get(device_id.decode("utf-8"), []))
 
     def refresh_tags(self):
-        channel = grpc.insecure_channel('unix://' + SOCKET_PATH)
+        channel = grpc.insecure_channel(f'unix://{SOCKET_PATH}')
         stub = PodResourcesListerStub(channel)
         response = stub.List(ListPodResourcesRequest())
         new_tags = {}
@@ -201,9 +201,10 @@ class NvmlCheck(AgentCheck):
                     for device_id in device.device_ids:
                         # These are the tag names that datadog seems to use
                         new_tags[device_id] = [
-                            "pod_name:" + pod_name,
-                            "kube_namespace:" + kube_namespace,
-                            "kube_container_name:" + kube_container_name,
+                            f"pod_name:{pod_name}",
+                            f"kube_namespace:{kube_namespace}",
+                            f"kube_container_name:{kube_container_name}",
                         ]
+
         with self.lock:
             self.known_tags = new_tags

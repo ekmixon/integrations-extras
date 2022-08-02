@@ -55,7 +55,7 @@ def test_check(aggregator, instance, mock_metrics):
     check.check(MOCK_INSTANCE)
 
     EXPECTED_METRICS = dict(CERT_METRICS)
-    EXPECTED_METRICS.update(CONTROLLER_METRICS)
+    EXPECTED_METRICS |= CONTROLLER_METRICS
     EXPECTED_METRICS.update(ACME_METRICS)
 
     for metric_name, metric_type in EXPECTED_METRICS.items():

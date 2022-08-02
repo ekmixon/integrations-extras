@@ -6,4 +6,4 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 HOST = get_docker_hostname()
 
-URL = 'http://{}:9600'.format(HOST)
+URL = f'http://{HOST}:9600'
